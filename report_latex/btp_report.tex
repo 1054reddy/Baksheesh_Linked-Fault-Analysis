@@ -1,0 +1,85 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+% -------------------------------------------------------------
+% IIT Indore Report Formatting Packages (reportbtp.pdf)
+% -------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[left=1.25in,right=1.0in,top=1.0in,bottom=1.0in]{geometry}
+\usepackage{times}              % Times New Roman typography
+\usepackage{setspace}
+\onehalfspacing                 % 1.5 line spacing mandated by IIT Indore
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cite}
+\usepackage[colorlinks=true,linkcolor=black,citecolor=blue,urlcolor=NavyBlue]{hyperref}
+
+\definecolor{NavyBlue}{RGB}{0,32,96}
+
+% Listings formatting for assembly and Python code
+\lstset{
+    frame=single,
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{NavyBlue}\bfseries,
+    commentstyle=\color{gray}\textit,
+    stringstyle=\color{purple},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4
+}
+
+\begin{document}
+
+% -------------------------------------------------------------
+% Front Matter
+% -------------------------------------------------------------
+\input{chapters/frontmatter.tex}
+
+% -------------------------------------------------------------
+% Table of Contents, List of Figures, List of Tables
+% -------------------------------------------------------------
+\tableofcontents
+\cleardoublepage
+
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+\cleardoublepage
+
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+\cleardoublepage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% -------------------------------------------------------------
+% Main Technical Chapters
+% -------------------------------------------------------------
+\input{chapters/ch1_introduction.tex}
+\input{chapters/ch2_ciphers.tex}
+\input{chapters/ch3_linked_fault_analysis.tex}
+\input{chapters/ch4_riscv_simulation.tex}
+\input{chapters/ch5_results_and_discussion.tex}
+\input{chapters/ch6_countermeasures_and_conclusions.tex}
+
+% -------------------------------------------------------------
+% References
+% -------------------------------------------------------------
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\addcontentsline{toc}{chapter}{References}
+\cleardoublepage
+
+% -------------------------------------------------------------
+% Appendices
+% -------------------------------------------------------------
+\input{chapters/appendices.tex}
+
+\end{document}

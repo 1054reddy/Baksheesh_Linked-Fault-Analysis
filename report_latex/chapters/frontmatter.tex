@@ -1,0 +1,187 @@
+% Front Matter conforming to IIT Indore BTP Guidelines (reportbtp.pdf)
+
+% -------------------------------------------------------------
+% COVER PAGE (Page 2 of reportbtp.pdf sample)
+% -------------------------------------------------------------
+\begin{titlepage}
+\centering
+\vspace*{0.5cm}
+{\huge \textbf{B. TECH. PROJECT REPORT}\par}
+\vspace{1.0cm}
+{\Large \textit{On}\par}
+\vspace{1.0cm}
+{\huge \textbf{\textcolor{NavyBlue}{Emerging Fault Analysis Techniques of Lightweight Ciphers}}\par}
+\vspace{2.5cm}
+{\Large \textbf{BY}\par}
+\vspace{0.8cm}
+{\LARGE \textbf{Milkuri Raja Reddy (230001054)}\par}
+\vspace{0.3cm}
+{\LARGE \textbf{Dharavath Vikas (230002023)}\par}
+\vfill
+{\Large \textbf{DISCIPLINE OF COMPUTER SCIENCE AND ENGINEERING}\par}
+\vspace{0.4cm}
+{\Large \textbf{INDIAN INSTITUTE OF TECHNOLOGY INDORE}\par}
+\vspace{0.4cm}
+{\Large \textbf{November 2026}\par}
+\vspace*{0.5cm}
+\end{titlepage}
+
+\cleardoublepage
+
+% -------------------------------------------------------------
+% TITLE PAGE (Page 3 of reportbtp.pdf sample)
+% -------------------------------------------------------------
+\begin{titlepage}
+\centering
+\vspace*{0.5cm}
+{\huge \textbf{Emerging Fault Analysis Techniques of Lightweight Ciphers}\par}
+\vspace{1.5cm}
+{\Large \textbf{A PROJECT REPORT}\par}
+\vspace{0.5cm}
+{\large \textit{Submitted in partial fulfillment of the requirements for the award of the degree of}\par}
+\vspace{0.3cm}
+{\large \textit{of}\par}
+\vspace{0.3cm}
+{\Large \textbf{BACHELOR OF TECHNOLOGY}\par}
+\vspace{0.3cm}
+{\large \textit{in}\par}
+\vspace{0.3cm}
+{\Large \textbf{COMPUTER SCIENCE AND ENGINEERING}\par}
+\vspace{1.5cm}
+{\large \textit{Submitted by:}\par}
+\vspace{0.3cm}
+{\Large \textbf{Milkuri Raja Reddy (230001054)}\par}
+\vspace{0.2cm}
+{\Large \textbf{Dharavath Vikas (230002023)}\par}
+\vspace{1.5cm}
+{\large \textit{Guided by:}\par}
+\vspace{0.3cm}
+{\Large \textbf{Prof. Bodhisatwa Mazumdar}\par}
+\vspace{0.2cm}
+{\large Department of Computer Science and Engineering\par}
+\vfill
+{\Large \textbf{INDIAN INSTITUTE OF TECHNOLOGY INDORE}\par}
+\vspace{0.3cm}
+{\Large \textbf{November 2026}\par}
+\vspace*{0.5cm}
+\end{titlepage}
+
+\cleardoublepage
+\pagenumbering{roman}
+\setcounter{page}{4}
+
+% -------------------------------------------------------------
+% CANDIDATE'S DECLARATION & CERTIFICATE (Page 4 of reportbtp.pdf)
+% -------------------------------------------------------------
+\chapter*{Candidate's Declaration}
+\addcontentsline{toc}{chapter}{Candidate's Declaration}
+
+We hereby declare that the project entitled \textbf{``Emerging Fault Analysis Techniques of Lightweight Ciphers''} submitted in partial fulfillment for the award of the degree of Bachelor of Technology in `\textbf{Computer Science and Engineering}' completed under the supervision of \textbf{Prof. Bodhisatwa Mazumdar}, Department of Computer Science and Engineering, IIT Indore is an authentic work carried out by us.
+
+\noindent
+Further, we declare that we have not submitted this work for the award of any other degree or diploma elsewhere.
+
+\vspace{2.5cm}
+\noindent
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}ll}
+\rule{6.5cm}{0.4pt} & \rule{6.5cm}{0.4pt} \\
+\textbf{Milkuri Raja Reddy (230001054)} & \textbf{Dharavath Vikas (230002023)} \\
+B.Tech. IV Year & B.Tech. IV Year \\
+Department of CSE, IIT Indore & Department of CSE, IIT Indore \\
+Date: November 20, 2026 & Date: November 20, 2026 \\
+\end{tabular*}
+
+\vspace{1.5cm}
+\noindent
+\rule{\textwidth}{1.0pt}
+\vspace{0.5cm}
+
+\section*{CERTIFICATE by BTP Guide(s)}
+
+It is certified that the above statement made by the students \textbf{Milkuri Raja Reddy (230001054)} and \textbf{Dharavath Vikas (230002023)} is correct to the best of my knowledge and belief.
+
+\vspace{2.5cm}
+\noindent
+\begin{tabular}{l}
+\rule{7.0cm}{0.4pt} \\
+\textbf{Prof. Bodhisatwa Mazumdar} \\
+Professor, Department of Computer Science and Engineering \\
+Indian Institute of Technology Indore \\
+Date: November 20, 2026 \\
+\end{tabular}
+
+\cleardoublepage
+
+% -------------------------------------------------------------
+% PREFACE (Page 5 of reportbtp.pdf)
+% -------------------------------------------------------------
+\chapter*{Preface}
+\addcontentsline{toc}{chapter}{Preface}
+
+This report on \textbf{``Emerging Fault Analysis Techniques of Lightweight Ciphers''} is prepared under the guidance of \textbf{Prof. Bodhisatwa Mazumdar}, Department of Computer Science and Engineering, Indian Institute of Technology Indore.
+
+Lightweight block ciphers are widely deployed in modern Cyber-Physical Systems (CPS), smart cards, and Internet-of-Things (IoT) edge microcontrollers. Due to severe constraints on silicon area and power budgets, newly proposed lightweight ciphers frequently adopt low-degree algebraic structures and simplified key schedules to minimize Threshold Implementation (TI) masking overheads. A prime example is \textbf{BAKSHEESH} (Baksi et al., 2023), introduced as an area-efficient alternative to GIFT-128. While BAKSHEESH successfully achieves a $2.43\times$ reduction in masked hardware area over GIFT-128, the designers explicitly made no claims regarding physical fault resistance.
+
+Through this report, we evaluate the vulnerability of emerging lightweight block ciphers against \textbf{Linked Fault Analysis (LFA)} (Beigizad et al., IEEE TIFS 2024). We analyze:
+\begin{enumerate}
+    \item \textbf{Linked Differential Fault Analysis (LDFA)} on unprotected implementations, recovering the full 128-bit key in exactly 31 faults in Round 35.
+    \item \textbf{Linked Ineffective Fault Analysis (LIFA)} on hardened implementations, proving that duplicate-and-compare redundancy countermeasures are fundamentally bypassed with an average of only 508.9 queries.
+    \item \textbf{Physical Realism Enhancements}: Demonstrating blind identification across all $\binom{32}{2} = 496$ candidate pairs with $100\%$ accuracy for $N \ge 5$, and proving key recovery resilience against glitch miss noise up to $p_{\text{miss}} = 30\%$.
+    \item \textbf{Cycle-Accurate RISC-V Hardware Modeling}: Validating instruction-skip fault injection in bare-metal RV32I assembly on the RARS simulator.
+    \item \textbf{Unified Lightweight Countermeasures}: Proposing, implementing, and empirically validating a combined SCA (3-share TI) and LFA-resistant architecture that completely neutralizes both LDFA and LIFA attacks.
+\end{enumerate}
+
+\vspace{1.5cm}
+\noindent
+\textbf{Milkuri Raja Reddy (230001054)} \\
+\textbf{Dharavath Vikas (230002023)} \\
+B.Tech. IV Year, Discipline of Computer Science and Engineering \\
+Indian Institute of Technology Indore
+
+\cleardoublepage
+
+% -------------------------------------------------------------
+% ACKNOWLEDGEMENTS (Page 6 of reportbtp.pdf)
+% -------------------------------------------------------------
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+
+We wish to express our profound gratitude and respect to our project supervisor, \textbf{Prof. Bodhisatwa Mazumdar}, Department of Computer Science and Engineering, Indian Institute of Technology Indore, for his kind support, valuable guidance, and inspiring mentorship throughout this B.Tech. Project. It is his deep domain expertise in hardware security, side-channel analysis, cryptographic implementations, and physical fault injection, due to which we became able to complete the theoretical foundations, microarchitectural assembly simulations, empirical attack pipelines, and this comprehensive technical report. Without his continuous support and encouragement, this work would not have been possible.
+
+We would also like to thank the Head of the Department and all faculty members of the Department of Computer Science and Engineering at IIT Indore for providing computational facilities, access to academic resources, and an enriching research environment.
+
+We express our gratitude to our peers and lab colleagues in the Hardware Security and Cryptography group for their engaging discussions and constructive critiques during our experimental evaluations.
+
+Lastly, we express our heartfelt appreciation to our parents, family members, and friends for their continuous patience, motivation, and moral support throughout our undergraduate journey.
+
+\vspace{1.5cm}
+\noindent
+\textbf{Milkuri Raja Reddy (230001054)} \\
+\textbf{Dharavath Vikas (230002023)} \\
+Department of Computer Science and Engineering \\
+Indian Institute of Technology Indore
+
+\cleardoublepage
+
+% -------------------------------------------------------------
+% ABSTRACT (Page 7 of reportbtp.pdf)
+% -------------------------------------------------------------
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+Lightweight block ciphers form the foundational cryptographic backbone of resource-constrained embedded systems, smart sensing dust, and autonomous Internet-of-Things (IoT) edge appliances. The lightweight block cipher \textbf{BAKSHEESH} was recently introduced as an area-efficient alternative to GIFT-128, utilizing an involution-based 4-bit S-Box with a non-trivial linear structure and a full 128-bit round key injection driven by a single 1-bit rotational key schedule. Although this design achieves a $2.43\times$ hardware area reduction under Threshold Implementation (TI) Boolean masking, the cipher does not incorporate inherent protection against physical fault injection.
+
+In this B.Tech. Project Report, we present a comprehensive mathematical, empirical, and microarchitectural evaluation of emerging lightweight block ciphers under \textbf{Linked Fault Analysis (LFA)}:
+\begin{enumerate}
+    \item \textbf{Linked Differential Fault Analysis (LDFA)}: In unprotected implementations, we demonstrate that injecting linked equality faults ($u' = v$) across adjacent nibbles in the final SubCells layer (Round 35) directly leaks equivalent subkey (ESK) differences. Across 31 adjacent nibble pairs, LDFA collapses the $2^{128}$ key search space down to only 16 candidate keys ($2^4$), uniquely resolved using a single known plaintext-ciphertext pair.
+    \item \textbf{Linked Ineffective Fault Analysis (LIFA)}: In hardened implementations fortified with spatial redundancy countermeasures (duplicate-and-compare), effective faults are caught and suppressed. However, when the two linked nibbles are naturally identical ($x[i] == x[j]$), the fault induces zero functional modification ($y[i] == y[j]$). This \textbf{ineffective fault completely bypasses the redundancy check}, emitting a valid ciphertext that directly leaks the subkey difference $\Delta esk[i, j]$. We prove that an empirical average of \textbf{508.9 queries} (theoretical expectation: 496.0 queries) achieves full 128-bit key recovery with a 100\% success rate.
+    \item \textbf{Architectural Comparison with GIFT-128}: We establish that while BAKSHEESH is fully broken in 1 round (31 faults / 508.9 queries), GIFT-128 requires attacking two consecutive rounds (Rounds 39 and 40) due to its 64-bit narrow key injection. Consequently, GIFT-128 requires 62 faults (LDFA) or $\approx 1000$ queries (LIFA) and leaves a 256-candidate space ($2^8$), demonstrating an inherent architectural resilience trade-off.
+    \item \textbf{Robustness to Practical Noise \& Unknown Fault Locations}: In realistic physical attack scenarios where the targeted pair is unknown, we design an automated locator that identifies the faulted nibble pair $(i, j)$ with \textbf{100.0\% accuracy for $N \ge 5$ blind ciphertexts} via majority voting over all $\binom{32}{2} = 496$ candidate pairs. Furthermore, we demonstrate that majority voting tolerates glitch miss noise up to $p_{\text{miss}} = 30\%$ with $100\%$ key recovery success across $N \le 30$ attempts per relation.
+    \item \textbf{Cycle-Accurate RISC-V Hardware Validation}: We implement Round 1 of BAKSHEESH in bare-metal RV32I assembly (\texttt{baksheesh\_round1.s}) and validate inside the RARS simulator that single instruction skips during the S-box substitution loop physically produce the exact linked equality relation.
+    \item \textbf{Proposed Unified Countermeasures}: To mitigate LFA, we propose, implement, and benchmark a unified countermeasure suite combining explicit register zeroing (\texttt{li x31, 0}), S-box loop shuffling, and asymmetric infective dummy state diffusion. We prove that this unified architecture drops adversary attack success from 100\% to 0\% while preserving BAKSHEESH's $2.43\times$ masking advantage.
+\end{enumerate}
+
+\noindent
+\textbf{Keywords}: Lightweight Cryptography, BAKSHEESH, GIFT-128, Linked Fault Analysis, Linked Ineffective Fault Analysis, Redundancy Countermeasures, Unknown Fault Location, Noise Tolerance, RISC-V RV32I, RARS, Unified Countermeasures.
+
+\cleardoublepage

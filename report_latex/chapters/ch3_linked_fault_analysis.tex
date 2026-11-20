@@ -1,0 +1,78 @@
+\chapter{Linked Fault Analysis: Mathematical Framework}
+\label{ch:lfa}
+
+\section{The Linked Fault Threat Model}
+\label{sec:lfa_model}
+In traditional fault models, an adversary injects an independent differential $\delta$, corrupting state variable $u \to u \oplus \delta$. In \textbf{Linked Fault Analysis (LFA)}~\cite{beigizad2024linked}, the fault establishes a deterministic structural link between two distinct intermediate variables:
+\begin{equation}
+    u' = l(v)
+\end{equation}
+In hardware architectures and microprocessors, the most common linkage is the \textbf{equality fault}:
+\begin{equation}
+    u' = v
+\end{equation}
+This occurs when a clock glitch or laser pulse causes an S-box lookup to be skipped in assembly, causing the accumulator register to reuse the prior nibble's value.
+
+\section{Linked Differential Fault Analysis (LDFA)}
+\label{sec:ldfa_math}
+Consider Round 35 (the final round) of BAKSHEESH. Let $x_{35}$ denote the state entering \texttt{SubCells}, $y_{35} = S(x_{35})$ denote the state after \texttt{SubCells}, and $w_{35} = y_{35} \oplus esk_{35}$ denote the equivalent subkey state before \texttt{PermBits}.
+
+When a linked fault forces $y'_{35}[j] = y'_{35}[i]$:
+\begin{enumerate}
+    \item Correct execution: $w[i] = y[i] \oplus esk[i]$ and $w[j] = y[j] \oplus esk[j]$.
+    \item Faulty execution: $w'[j] = y'[j] \oplus esk[j] = y[i] \oplus esk[j]$ and $w'[i] = y[i] \oplus esk[i]$.
+    \item XOR sum of faulty nibbles:
+    \begin{equation}
+        w'[i] \oplus w'[j] = (y[i] \oplus esk[i]) \oplus (y[i] \oplus esk[j]) = esk[i] \oplus esk[j] = \Delta esk[i, j]
+    \end{equation}
+\end{enumerate}
+
+Since $w'$ is computed directly from the faulty ciphertext $C'$:
+\begin{equation}
+    w' = \text{PermBits}^{-1}(C' \oplus \text{AddConstants}_{35})
+\end{equation}
+the attacker extracts the exact 4-bit difference between subkey nibbles $i$ and $j$ from a \textbf{single faulty ciphertext}.
+
+\subsection{Spanning Tree Key Reduction}
+By chaining 31 adjacent pairs $(0, 1), (1, 2), \dots, (30, 31)$, all 32 nibbles of the equivalent subkey are determined up to a single base nibble $esk[0]$:
+\begin{equation}
+    esk[k] = esk[0] \oplus \bigoplus_{m=0}^{k-1} \Delta esk[m, m+1]
+\end{equation}
+This collapses the $2^{128}$ key search space to only $2^4 = 16$ candidate keys!
+
+\section{Linked Ineffective Fault Analysis (LIFA)}
+\label{sec:lifa_math}
+On devices protected by spatial redundancy (duplicate-and-compare), effective faults ($y'[j] \neq y[j]$) trigger an output discrepancy ($C_1 \neq C_2$), causing the device to suppress the ciphertext.
+
+\subsection{The Ineffective Bypass Condition}
+However, if the two input nibbles happen to be naturally equal ($x[i] == x[j]$):
+Because the S-box is a bijection:
+\begin{equation}
+    x[i] == x[j] \iff S(x[i]) == S(x[j]) \iff y[i] == y[j]
+\end{equation}
+When the fault forces $y'[j] = y[i]$, the faulty value is:
+\begin{equation}
+    y'[j] = y[i] = y[j]
+\end{equation}
+\textbf{The fault produces zero alteration to the state!} Both redundant pipelines compute the exact same result. The comparator detects no mismatch and emits the valid ciphertext $C$.
+
+\subsection{Ineffective Leakage Equation}
+When a valid ciphertext is emitted under fault injection, the attacker knows with certainty that $y[i] == y[j]$:
+\begin{equation}
+    w[i] \oplus w[j] = (y[i] \oplus esk[i]) \oplus (y[j] \oplus esk[j]) = (y[i] \oplus y[j]) \oplus (esk[i] \oplus esk[j]) = \Delta esk[i, j]
+\end{equation}
+The emitted ineffective ciphertext directly leaks the equivalent subkey difference, completely defeating duplicate-and-compare redundancy!
+
+\subsection{Query Complexity Formulation}
+Since 4-bit nibbles $x[i]$ and $x[j]$ are uniformly distributed across random plaintexts:
+\begin{equation}
+    P(x[i] == x[j]) = 2^{-4} = \frac{1}{16} = 0.0625
+\end{equation}
+The queries required to observe an ineffective fault follow a Geometric distribution:
+\begin{equation}
+    E[Q_{i, j}] = \frac{1}{p} = 16 \implies E[Q_{\text{total}}] = 31 \times 16 = 496.0 \text{ queries}
+\end{equation}
+
+\section{Candidate Disambiguation}
+\label{sec:disambiguation}
+Evaluating the 16 candidate master keys against a single known $(P, C)$ pair uniquely identifies the true 128-bit master key with probability $1 - 15 \times 2^{-128} \approx 1.0$.

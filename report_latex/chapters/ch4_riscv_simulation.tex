@@ -1,0 +1,42 @@
+\chapter{Cycle-Accurate RISC-V Hardware Fault Simulation}
+\label{ch:riscv}
+
+\section{Motivation for ISA-Level Validation}
+\label{sec:riscv_motivation}
+Theoretical fault models often face skepticism regarding whether linked equality faults ($u' = v$) physically occur on realistic microarchitectures. To bridge theoretical cryptography and embedded computer systems, we implemented Round 1 of BAKSHEESH in bare-metal 32-bit RISC-V assembly (\texttt{baksheesh\_round1.s}) and executed it in the cycle-accurate RARS simulator~\cite{rars_simulator}.
+
+\section{Bare-Metal RV32I Assembly Design}
+\label{sec:rv32i_design}
+The 128-bit state $X$ is allocated across four 32-bit integer registers (\texttt{x10}--\texttt{x13}, labeled \texttt{a0}--\texttt{a3}), where:
+\begin{itemize}
+    \item \texttt{a0} holds nibbles $w_0 \dots w_7$
+    \item \texttt{a1} holds nibbles $w_8 \dots w_{15}$
+    \item \texttt{a2} holds nibbles $w_{16} \dots w_{23}$
+    \item \texttt{a3} holds nibbles $w_{24} \dots w_{31}$
+\end{itemize}
+
+\subsection{S-Box Substitution Loop and Candidate Injection Points}
+The assembly routine iterates across each nibble:
+\begin{lstlisting}[language={[RISC-V]Assembler}, caption={RV32I S-Box Substitution Loop and Candidate Injection Point (CIP).}]
+sc_loop:
+    # 1. Extract 4-bit nibble value
+    srl  x30, x30, x29
+    andi x30, x30, 0xF         # x30 = nibble x[i]
+    
+    # 2. Candidate Injection Point (CIP):
+    add  x31, x28, x30         # x31 = sbox table address
+    lbu  x31, 0(x31)           # CIP: Target instruction for glitch!
+    
+    # 3. Position and accumulate
+    sll  x31, x31, x29         # Shift substituted nibble into place
+    or   x14, x14, x31         # Accumulate into word accumulator
+\end{lstlisting}
+
+\section{Microarchitectural Instruction-Skip Modeling}
+\label{sec:instruction_skip}
+When an adversary applies a physical clock glitch or laser pulse during the execution of \texttt{lbu x31, 0(x31)}, the CPU skips the load instruction. Consequently:
+\begin{enumerate}
+    \item Register \texttt{x31} retains the value from the previous loop iteration.
+    \item The accumulator executes $y[i] = y[i-1]$.
+\end{enumerate}
+This physically produces the exact linked equality relation $u' = v$ on standard RISC-V hardware without requiring specialized attack hardware.

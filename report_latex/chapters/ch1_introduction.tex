@@ -1,0 +1,48 @@
+\chapter{Introduction}
+\label{ch:intro}
+
+\section{Background and Motivation}
+\label{sec:background}
+The rapid proliferation of Cyber-Physical Systems (CPS), smart microgrids, automotive electronic control units (ECUs), implantable biomedical electronics, and edge Internet-of-Things (IoT) sensor nodes has revolutionized modern digital infrastructure. These embedded devices process sensitive financial, personal, and operational telemetry in real time. However, unlike traditional enterprise servers and desktop workstations that operate within secure server rooms with plentiful power, edge devices operate under stringent computational, thermal, and electrical constraints. Modern edge microcontrollers frequently feature fewer than 2,000 to 5,000 logic gate equivalents (GE) dedicated to security primitives, minimal volatile SRAM, and micro-watt energy envelopes.
+
+To satisfy these uncompromising requirements, the cryptographic research community has standardized dedicated \textbf{Lightweight Block Ciphers}. Rather than deploying heavyweight standards such as the Advanced Encryption Standard (AES)~\cite{biham1997differential}, embedded designers employ lightweight primitives like PRESENT, SIMON, SPECK, and GIFT-128~\cite{banik2017gift}. In 2023, Baksi et al.~\cite{baksi2023baksheesh} introduced \textbf{BAKSHEESH}, positioning it as ``similar yet different from GIFT-128''. BAKSHEESH adopts the general substitution-permutation network (SPN) topology of GIFT-128 but incorporates two major modifications:
+\begin{enumerate}
+    \item It replaces GIFT-128's degree-3 S-box with an involution-based 4-bit S-box possessing a non-trivial linear structure ($8 \to F$).
+    \item It replaces GIFT-128's split LFSR-driven key schedule with a full 128-bit key injection driven by a trivial 1-bit cyclic rotation schedule.
+\end{enumerate}
+These architectural optimizations achieve an impressive $2.43\times$ hardware area reduction when protected against Side-Channel Analysis (SCA) using 3-share Threshold Implementation (TI) Boolean masking. However, the designers of BAKSHEESH explicitly stated in their specification that they made no claims regarding physical fault resistance.
+
+\section{Physical Fault Attacks vs. Speculative Execution Attacks}
+\label{sec:faults_vs_speculation}
+In contemporary microarchitectural security, it is vital to draw a strict boundary between active physical fault injection attacks and passive transient execution side channels:
+\begin{itemize}
+    \item \textbf{Transient / Speculative Execution Attacks}: Microarchitectural vulnerabilities like Spectre and Meltdown~\cite{canella2020systematic} exploit speculative execution windows, out-of-order instruction scheduling, and branch prediction buffers without altering physical architectural register states. These attacks leak confidential information via timing side channels in hardware caches. Consequently, software serialization barriers and pipeline fences (such as \texttt{fence.i} in RISC-V or \texttt{lfence} in x86) are capable of suppressing transient speculation leakage.
+    \item \textbf{Active Physical Fault Injection Attacks (FIA)}: Physical fault injection actively perturbs the hardware environment using clock glitches, voltage starvation, electromagnetic pulses (EMP), or focused infrared/optical laser beams. Physical fault attacks directly flip bits in silicon flip-flops, corrupt data buses, or force the processor program counter to skip instructions. \textbf{Software speculation barriers cannot prevent physical hardware bit-flips or instruction skips}, necessitating algorithmic fault-tolerant designs or hardware-level redundancy countermeasures.
+\end{itemize}
+
+\section{State-of-the-Art Fault Countermeasures}
+\label{sec:countermeasures_state_of_art}
+To protect cryptographic devices against classical Differential Fault Analysis (DFA)~\cite{biham1997differential}---where an adversary compares a correct ciphertext $C$ against a corrupted ciphertext $C'$ to reconstruct subkey nibbles---engineers deploy redundancy-based countermeasures:
+\begin{enumerate}
+    \item \textbf{Spatial Redundancy (Duplicate-and-Compare)}: The cipher is instantiated across two identical hardware cryptographic engines operating in parallel (or executed twice sequentially in software). A hardware comparator unit evaluates $C_1 \stackrel{?}{=} C_2$. If an error difference is detected, the device suppresses the ciphertext and emits a fault exception or zeroized vector.
+    \item \textbf{Infective Computation}: Instead of using conditional branching (which is susceptible to branch-skipping attacks), the internal difference between redundant paths is algebraically multiplied with an error diffusion matrix to randomize or ``infect'' the ciphertext before output emission.
+\end{enumerate}
+Under both defensive models, classical DFA is completely thwarted because the adversary is denied access to faulty ciphertexts.
+
+\section{Research Objectives and Core Contributions}
+\label{sec:contributions}
+This B.Tech. Project investigates the vulnerability of emerging lightweight block ciphers under the newly proposed \textbf{Linked Fault Analysis (LFA)} paradigm~\cite{beigizad2024linked}. LFA exploits structural dependencies where an injected fault forces an intermediate state variable $u'$ to link to another intermediate variable $v$ ($u' = l(v)$).
+
+The major contributions of this report are organized as follows:
+\begin{enumerate}
+    \item \textbf{Full Mathematical Formulation of LDFA}: We establish that 31 adjacent-pair linked faults in Round 35 of BAKSHEESH directly yield equivalent subkey differences $\Delta esk[i, i+1]$, collapsing the master key space from $2^{128}$ down to 16 candidates ($2^4$), resolved with 1 verification pair.
+    \item \textbf{Defeating Redundancy Countermeasures via LIFA}: We prove that when $x[i] == x[j]$, the linked fault induces zero state change ($y[i] == y[j]$). This ineffective fault passes through duplicate-and-compare circuits undetected, emitting a valid ciphertext that leaks $\Delta esk[i, j]$ with an empirical mean of 508.9 queries.
+    \item \textbf{Comparative Security Analysis with GIFT-128}: We demonstrate that GIFT-128 requires attacking two consecutive rounds (Rounds 39 and 40) due to its 64-bit key injection, requiring 62 faults (LDFA) or $\approx 1000$ queries (LIFA) and leaving 256 candidates, proving an architectural trade-off between key schedule width and fault resilience.
+    \item \textbf{Physical Realism: Blind Fault Localization \& Noise Tolerance}: We design and validate an automated locator that identifies the unknown faulted pair $(i, j)$ with 100\% accuracy for $N \ge 5$ blind ciphertexts across all 496 candidates, and prove that majority voting tolerates glitch miss noise up to $p_{\text{miss}} = 30\%$.
+    \item \textbf{Cycle-Accurate RISC-V Hardware Modeling}: We design a bare-metal RV32I assembly model (\texttt{baksheesh\_round1.s}) in RARS, demonstrating that physical instruction skips in the S-box substitution loop physically execute the linked equality condition.
+    \item \textbf{Unified Lightweight Countermeasures}: We propose, implement, and benchmark a complete defensive architecture (register zeroing, loop shuffling, and infective diffusion) that drops adversary success from 100\% to 0\%.
+\end{enumerate}
+
+\section{Organization of the Report}
+\label{sec:organization}
+The remainder of this report is organized as follows: Chapter~\ref{ch:ciphers} specifies the architectural details of BAKSHEESH and GIFT-128. Chapter~\ref{ch:lfa} establishes the mathematical framework of Linked Fault Analysis (LDFA and LIFA). Chapter~\ref{ch:riscv} details the cycle-accurate RISC-V assembly simulation. Chapter~\ref{ch:results} provides the empirical experimental results, blind fault identification scaling, noise tolerance, and comparative evaluations. Chapter~\ref{ch:countermeasures} details the proposed unified countermeasures and future work, followed by References and Appendices.
